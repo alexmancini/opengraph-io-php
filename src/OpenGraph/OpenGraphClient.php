@@ -87,11 +87,8 @@ class OpenGraphClient
      */
     public function fetch($site_url) {
         if (strlen($site_url) && gettype($site_url) == 'string') {
-            if (! defined('SITE_URL'))
-                define('SITE_URL', $site_url);
-
             /* To unit test formUrl comment first return statement and uncomment last comment statement */
-            return (new OpenGraphRequest())->request($this->formUrl());
+            return (new OpenGraphRequest())->request($this->formUrl($site_url));
             // return $this->formUrl();
         } else {
             throw new OpenGraphException("Missing required param Site URL.");
@@ -101,29 +98,31 @@ class OpenGraphClient
     /**
      * Setup URL to request through API
      *
+     * @param string $url The URL to request.
+     *
      * @return mixed
      * @throws OpenGraphException
      */
-    private function formUrl() {
-        if (defined('API_KEY') && defined('SITE_URL')) {
+    private function formUrl($url) {
+        if (defined('API_KEY') && ! empty($url)) {
             if (defined('CACHE_OK')) {
                 if (defined('FULL_RENDER')) {
                     /* CACHE_OK & FULL_RENDER both are defined */
-                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode(SITE_URL)
+                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode($url)
                         . '?cache_ok=true&full_render=true&app_id=' . API_KEY;
                 } else {
                     /* Only CACHE_OK is defined */
-                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode(SITE_URL)
+                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode($url)
                         . '?cache_ok=true&app_id=' . API_KEY;
                 }
             } else {
                 /* Only FULL_RENDER is defined */
                 if (defined('FULL_RENDER')) {
-                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode(SITE_URL)
+                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode($url)
                         . '?full_render=true&app_id=' . API_KEY;
                 } else {
                     /* CACHE_OK & FULL_RENDER both are not defined */
-                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode(SITE_URL)
+                    $this->url_to_hit = $this->base_url . $this->api_version . '/site/' . urlencode($url)
                         . '?app_id=' . API_KEY;
                 }
             }
